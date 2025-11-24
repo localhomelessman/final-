@@ -1,0 +1,4 @@
+World Population by countries (2025) is a numerical dataset that has 234 rows and 12 columns. 
+
+It was gotten from Kaggle.com below at
+https://www.kaggle.com/datasets/samithsachidanandan/world-population-by-countries-2025/code

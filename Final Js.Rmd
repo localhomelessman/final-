@@ -1,0 +1,280 @@
+---
+title: "Final project js"
+output: html_notebook
+---
+
+#### Libraries.
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(ggplot2)
+library(htmltools)
+library(bslib)
+library(plotly)
+
+```
+
+#### Summary
+
+In Kaggle's 2025 population data set there was some correlation between population and the other variables. With it increasing with world share and migrants while decreasing with median age and population density. Although there was no pattern for yearly change and fertility rate this means that the proposal that population effects a country's other variables is correct. 
+
+
+#### Purpose
+
+The purpose of this project is to use Kaggle's 2025 population data set, clean and view it with Rstudio in order to determine whether a countries population determines its other variables, by comparing population with variables like yearly change or fertility rate is there any visible patterns and if so would they be directly or inversely related. 
+
+#### Data
+
+```{r}
+summary(five)
+```
+The data set has 234 rows and 12 columns making a total of 2308 values.
+
+
+Variables.
+
+Rank (numerical) = countrys ranked by population
+Country (catergorical) = country name
+Population (numerical) = current population (dataset is 9 months old so this is no longer current)
+Yearly change (numerical) yearly change in population
+Net change (numerical) = total population change
+density p/km (numerical) = population density per kilometer
+Land area (numerical) = area per country
+migrants (numerical) = total of migrants
+Fertility rate (numerical) = average number of children to women
+median age (numerical) = median age of population
+urban population (numerical) = percentage of population living in cities
+world share (numerical) = population relative to global population
+
+
+As shown below this is the cleaned data, The percentage (%) were removed through mutate from Yearly change, Urban Population and World share. Similarly (,) were removed from Land area population 2024, migrants and net change through mutate also. There was no N.A functions to replace.
+```{r}
+population <- five %>%
+  mutate(
+     Yearly.Change = as.numeric(str_extract(gsub("%","",Yearly.Change), "[0-9\\.]+")),
+     Land.Area..Km.. = as.numeric(str_extract(gsub(",","",Land.Area..Km..), "[0-9\\.]+")),
+     Population..2024. = as.numeric(str_extract(gsub(",","",Population..2024.), "[0-9\\.]+")),
+     Migrants..net. = as.numeric(str_extract(gsub(",","",Migrants..net.), "[0-9\\.]+")),
+     Net.Change = as.numeric(str_extract(gsub(",","",Net.Change), "[0-9\\.]+")),
+     Urban.Pop.. = as.numeric(str_extract(gsub("%","",Urban.Pop..), "[0-9\\.]+")),
+     World.Share = as.numeric(str_extract(gsub("%","",World.Share), "[0-9\\.]+")),
+     
+     
+  )
+five
+```
+
+
+#### Explatory Data analysis
+
+
+
+```{r}
+No_outliers <- population %>%
+  filter(Population..2024.< 1000000000)
+```
+the outliners India and China were removed because their significantly higher population than the rest of the populations however there still remains a clear divide between the larger and smaller populations though not by the hundreds of millions that these two had.
+
+
+
+This is the default graph comparing the yearly change (X) and population in 2024 (Y).
+
+```{r}
+ggplot(No_outliers) +
+  geom_point( mapping  = aes(x = Yearly.Change, y = Population..2024., color = Population..2024. )) +
+  labs(
+    x = "Yearly change %",
+    y = "Population",
+    title = "All countries population vs yearly change.",
+    
+    
+  )
+```
+As shown above the highest number of countries rest inside the .05% population change, with the rarest being a 4% yearly change. Another pattern shown above is how no countries above a population of 1 million (1e+08) had a change greater than 3.8%, only countries below 1 million had a yearly change of 4% or greater.
+
+
+
+Some statistics like world share and population size are directly proportional, World share is the same as population size because world share is a dependent variable of the population. The greater the population the larger the world share.
+```{r}
+ggplot(No_outliers) +
+  geom_point( mapping  = aes(x = World.Share , y = Population..2024.,)) +
+  labs(
+    y = "Country size (ascending",
+    x = "world share",
+    title = "World share vs Population size. ",
+    
+  )
+```
+Migrants also has a postive pattern with population, larger countries have more immigration while smaller countries have less immigration. However there are some exceptions with some larger countries having less immigration and the inverse for some smaller countries.
+```{r}
+ggplot(No_outliers) +
+  geom_point( mapping  = aes(x = Migrants..net. , y = Population..2024.,)) +
+  labs(
+    y = "Country size (ascending",
+    x = "Migrants",
+    title = "Immigration vs Population size. ",
+    
+  )
+```
+
+
+
+This compares median age(Y) with population (X), median age trended to be higher in smaller population with a surprisingly high amount of developed countries having median ages below 20. 
+```{r}
+ggplot(No_outliers) +
+  geom_point( mapping  = aes(x = Med..Age, y = Population..2024.,)) +
+  labs(
+    y = "Country size (ascending",
+    x = "Median age",
+    title = "Median age vs Population size. ",
+    
+  )
+```
+
+```{r}
+ggplot(No_outliers) +
+  geom_point( mapping  = aes(x = Fert..Rate, y = Population..2024.,)) +
+  labs(
+    y = "Country size (ascending",
+    x = "Median age",
+    title = "Median age vs Population size. ",
+    
+  )
+```
+
+
+
+#### Results
+
+In Kaggle's 2025 World population's data set there was some determinable patterns between population and variables. Some were directly proportional (World Share) while other variables migrants, land area and net change had similar patterns increasing along with population. This shows the population size directly determines the land area net change and migrants.
+
+Other patterns were negative in relation to the total population. Median age and population density tended to decrease for larger populations and increase for smaller populations, this gives it a negative pattern to population size making larger populations have smaller median age's and population density.
+
+Lastly fertility rate and yearly change both showed inconclusive patterns. Both didn't show any clear patterns after reviewing the data with both varying drastically per country, further research most likely will be needed but Population size appears to not have a impact on fertility rate and yearly change.
+
+#### Conclusions
+
+Population does in fact correlate between a countries data.
+
+#### Resources
+
+R for Data Science" by Garrett Grolemund and Hadley Wickham.
+
+Kaggle dataset.
+https://www.kaggle.com/datasets/samithsachidanandan/world-population-by-countries-2025/code
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+five <- read.csv("World Population Data.csv")
+five
+```
+
+```{r}
+population <- five %>%
+  mutate(
+     Yearly.Change = as.numeric(str_extract(gsub("%","",Yearly.Change), "[0-9\\.]+")),
+     Land.Area..Km.. = as.numeric(str_extract(gsub(",","",Land.Area..Km..), "[0-9\\.]+")),
+     Population..2024. = as.numeric(str_extract(gsub(",","",Population..2024.), "[0-9\\.]+")),
+     Migrants..net. = as.numeric(str_extract(gsub(",","",Migrants..net.), "[0-9\\.]+")),
+     Net.Change = as.numeric(str_extract(gsub(",","",Net.Change), "[0-9\\.]+")),
+     Urban.Pop.. = as.numeric(str_extract(gsub("%","",Urban.Pop..), "[0-9\\.]+")),
+     World.Share = as.numeric(str_extract(gsub("%","",World.Share), "[0-9\\.]+")),
+     
+     
+  )
+```
+
